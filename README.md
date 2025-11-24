@@ -4,6 +4,7 @@ Single-file, no-build web app that turns core personal-finance math into actiona
 
 Live Demo
 https://cyruslee2023.github.io/Convenient-Finance-Toolkit-for-young-adults/
+
 Features
 
 Multi-equation calculators
