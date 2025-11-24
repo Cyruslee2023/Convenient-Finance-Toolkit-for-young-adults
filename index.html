@@ -1,0 +1,516 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Young Finance Toolkit (Single‑File)</title>
+  <style>
+    :root { --bg:#0b0b0c; --fg:#e8e8ea; --muted:#a0a0a7; --card:#151518; --accent:#7cc4ff; --bad:#ff6b6b; --good:#6bff95; }
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--fg);font:14px/1.45 system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+    .wrap{max-width:1280px;margin:36px auto;padding:0 16px}
+    h1{font-size:24px;margin:0 0 6px}
+    .muted{color:var(--muted)}
+    .grid{display:grid;gap:16px}
+    .g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .g3{grid-template-columns:5.6fr 2.4fr 1.2fr; align-items:start;}
+    .card{background:var(--card);border:1px solid #222; border-radius:12px;padding:14px}
+    label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
+    input, textarea, select, button{width:100%;box-sizing:border-box}
+    input, textarea, select{background:#0f0f12;color:var(--fg);border:1px solid #2a2a32;border-radius:10px;padding:10px}
+    textarea{min-height:96px}
+    button{background:#1a1a20;color:var(--fg);border:1px solid #2a2a32;border-radius:10px;padding:10px;cursor:pointer}
+    button.primary{background:#13406b;border-color:#165087}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .badge{display:inline-block;padding:2px 8px;border-radius:10px;border:1px solid #2a2a32;background:#111}
+    .bad{border-color:#4b1a1a;background:#1d0f12;color:var(--bad)}
+    .good{border-color:#124b2a;background:#0f1d12;color:var(--good)}
+    .mono{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}
+    .hr{height:1px;background:#23232a;margin:14px 0}
+    .flex{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .small{font-size:12px}
+    .list{list-style:disc;padding-left:18px}
+    .link{color:#9fd0ff;text-decoration:none}
+    .link:hover{text-decoration:underline}
+    .sidebar{align-self:start; height:auto; position:sticky; top:16px;}
+    @media (max-width: 980px){ .g3{grid-template-columns:1fr} .sidebar{position:static} }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="flex" style="justify-content:space-between">
+      <div>
+        <h1>Convenient Finance Toolkit For Young Adults</h1>
+        <div class="muted small">Yunze Li's Single‑file HTML website for classroom and project testing. Data stays in your browser, no private information needed.</div>
+      </div>
+      <div class="badge">v1.2</div>
+    </header>
+
+    <div class="hr"></div>
+
+    <!-- Main 3-column layout: calculators, calculators, reference sidebar -->
+    <section class="grid g3">
+      <div class="grid g2">
+        <div class="card">
+          <h3>Savings & Growth</h3>
+          <div class="row">
+            <div>
+              <label>Present value ($)</label>
+              <input id="pv0" value="1000" />
+            </div>
+            <div>
+              <label>APR %</label>
+              <input id="apr1" value="6" />
+            </div>
+            <div>
+              <label>Years</label>
+              <input id="yrs1" value="5" />
+            </div>
+            <div>
+              <label>Compounds / year</label>
+              <input id="m1" value="12" />
+            </div>
+          </div>
+          <div class="flex">
+            <button class="primary" onclick="computeFV()">Compute FV</button>
+            <div>FV: <span id="fvOut" class="badge mono">—</span></div>
+          </div>
+          <div class="small muted mono">FV = PV · (1 + APR/m)^(m·t)</div>
+          <div class="hr"></div>
+          <div class="row">
+            <div>
+              <label>Future value target ($)</label>
+              <input id="fvT" value="1500" />
+            </div>
+            <div>
+              <label>APR %</label>
+              <input id="apr2" value="6" />
+            </div>
+            <div>
+              <label>Years</label>
+              <input id="yrs2" value="5" />
+            </div>
+            <div>
+              <label>Compounds / year</label>
+              <input id="m2" value="12" />
+            </div>
+          </div>
+          <div class="flex">
+            <button class="primary" onclick="computePV()">Compute PV</button>
+            <div>PV: <span id="pvOut" class="badge mono">—</span></div>
+          </div>
+          <div class="small muted mono">PV = FV / (1 + APR/m)^(m·t)</div>
+          <div class="hr"></div>
+          <div class="row">
+            <div>
+              <label>Nominal APR %</label>
+              <input id="aprN" value="19.99" />
+            </div>
+            <div>
+              <label>Compounds / year</label>
+              <input id="mA" value="12" />
+            </div>
+            <div>
+              <label>Effective APY %</label>
+              <input id="apyN" value="5.12" />
+            </div>
+            <div>
+              <label>Compounds / year</label>
+              <input id="mB" value="12" />
+            </div>
+          </div>
+          <div class="flex">
+            <button onclick="computeAPY()">APY from APR</button>
+            <span id="apyOut" class="badge mono">—</span>
+            <button onclick="computeAPR()">APR from APY</button>
+            <span id="aprOut" class="badge mono">—</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Loans & Debt</h3>
+          <div class="row">
+            <div>
+              <label>Principal ($)</label>
+              <input id="loanP" value="15000" />
+            </div>
+            <div>
+              <label>APR %</label>
+              <input id="loanAPR" value="7.9" />
+            </div>
+            <div>
+              <label>Years</label>
+              <input id="loanY" value="3" />
+            </div>
+            <div>
+              <label>Payments / year</label>
+              <input id="loanM" value="12" />
+            </div>
+          </div>
+          <div class="flex">
+            <button class="primary" onclick="computeLoanPayment()">Payment</button>
+            <div>$/period: <span id="loanPayOut" class="badge mono">—</span></div>
+          </div>
+          <div class="hr"></div>
+          <div class="row">
+            <div>
+              <label>Debt balance ($)</label>
+              <input id="debBal" value="2000" />
+            </div>
+            <div>
+              <label>APR %</label>
+              <input id="debAPR" value="23.99" />
+            </div>
+            <div>
+              <label>Fixed monthly payment ($)</label>
+              <input id="debPay" value="100" />
+            </div>
+            <div>
+              <label>&nbsp;</label>
+              <button onclick="computePayoff()">Months & interest</button>
+            </div>
+          </div>
+          <div class="flex">
+            <div>Months: <span id="monthsOut" class="badge mono">—</span></div>
+            <div>Total interest: <span id="totIntOut" class="badge mono">—</span></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Inflation & Valuation</h3>
+          <div class="row">
+            <div>
+              <label>Today's $</label>
+              <input id="infAmt" value="500" />
+            </div>
+            <div>
+              <label>Inflation %</label>
+              <input id="infRate" value="3" />
+            </div>
+            <div>
+              <label>Years</label>
+              <input id="infY" value="4" />
+            </div>
+            <div>
+              <label>&nbsp;</label>
+              <button onclick="computeInflationForward()">Future nominal</button>
+            </div>
+          </div>
+          <div class="flex">
+            <div>Future $ needed: <span id="infFwdOut" class="badge mono">—</span></div>
+          </div>
+          <div class="hr"></div>
+          <div class="row">
+            <div>
+              <label>Future $</label>
+              <input id="infFut" value="1000" />
+            </div>
+            <div>
+              <label>Inflation %</label>
+              <input id="infRate2" value="3" />
+            </div>
+            <div>
+              <label>Years</label>
+              <input id="infY2" value="5" />
+            </div>
+            <div>
+              <label>&nbsp;</label>
+              <button onclick="computeInflationBackward()">Today's power</button>
+            </div>
+          </div>
+          <div class="flex">
+            <div>Today's $ value: <span id="infBackOut" class="badge mono">—</span></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Suggestions & Planner</h3>
+          <div class="small muted">Auto‑suggestions update when you compute; edit the plan and save locally.</div>
+          <div class="hr"></div>
+          <div>
+            <label>Auto‑suggestions (read‑only)</label>
+            <textarea id="suggestions" readonly></textarea>
+          </div>
+          <div class="row">
+            <div>
+              <label>Plan notes (editable)</label>
+              <textarea id="planText" placeholder="Goals, actions, metrics..."></textarea>
+            </div>
+            <div>
+              <label>Quick actions</label>
+              <button onclick="appendSuggestions()">Append suggestions to plan</button>
+              <div style="height:8px"></div>
+              <button onclick="savePlan()">Save plan (local)</button>
+              <div style="height:8px"></div>
+              <button onclick="loadPlan()">Load plan</button>
+              <div style="height:8px"></div>
+              <button onclick="exportPlan()">Export plan (.txt)</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Quick Tests</h3>
+          <div class="small muted">Simple checks to verify formulas. Outputs show PASS/FAIL.</div>
+          <div class="hr"></div>
+          <button onclick="runTests()">Run tests</button>
+          <div id="testOut" class="mono small" style="margin-top:8px;white-space:pre-wrap"></div>
+        </div>
+      </div>
+
+      <!-- Reference sidebar -->
+      <aside class="card sidebar">
+        <h3>Reference: Examples of Low‑Cost Broad Funds</h3>
+        <div class="small muted">Not recommendations; verify fees/risks and suitability. Links go to provider pages.</div>
+        <div class="hr"></div>
+        <h4>U.S. Total Market</h4>
+        <ul class="list small">
+          <li><a class="link" href="https://investor.vanguard.com/investment-products/etfs/profile/vti" target="_blank">Vanguard Total Stock Market ETF (VTI)</a></li>
+          <li><a class="link" href="https://www.schwabassetmanagement.com/products/schb" target="_blank">Schwab U.S. Broad Market ETF (SCHB)</a></li>
+          <li><a class="link" href="https://www.fidelity.com/mutual-funds/fidelity-zero-total-market-index-fund/overview" target="_blank">Fidelity ZERO Total Market Index Fund (FZROX)</a> (mutual fund)</li>
+        </ul>
+        <h4>S&P 500 Core</h4>
+        <ul class="list small">
+          <li><a class="link" href="https://www.ishares.com/us/products/239726/ishares-core-sp-500-etf" target="_blank">iShares Core S&P 500 ETF (IVV)</a></li>
+          <li><a class="link" href="https://investor.vanguard.com/investment-products/etfs/profile/voo" target="_blank">Vanguard S&P 500 ETF (VOO)</a></li>
+          <li><a class="link" href="https://www.ssga.com/us/en/individual/etfs/funds/spdr-sp-500-etf-trust-spy" target="_blank">SPDR S&P 500 ETF Trust (SPY)</a></li>
+        </ul>
+        <h4>Total World / International</h4>
+        <ul class="list small">
+          <li><a class="link" href="https://investor.vanguard.com/investment-products/etfs/profile/vt" target="_blank">Vanguard Total World Stock ETF (VT)</a></li>
+          <li><a class="link" href="https://investor.vanguard.com/investment-products/etfs/profile/vxus" target="_blank">Vanguard Total International Stock ETF (VXUS)</a></li>
+          <li><a class="link" href="https://www.ishares.com/us/products/239623/ishares-msci-eafe-etf" target="_blank">iShares MSCI EAFE ETF (EFA)</a> (developed ex‑US)</li>
+          <li><a class="link" href="https://investor.vanguard.com/investment-products/etfs/profile/vwo" target="_blank">Vanguard FTSE Emerging Markets ETF (VWO)</a></li>
+        </ul>
+        <h4>U.S. Bonds</h4>
+        <ul class="list small">
+          <li><a class="link" href="https://investor.vanguard.com/investment-products/etfs/profile/bnd" target="_blank">Vanguard Total Bond Market ETF (BND)</a></li>
+          <li><a class="link" href="https://www.ishares.com/us/products/239458/ishares-core-us-aggregate-bond-etf" target="_blank">iShares Core U.S. Aggregate Bond ETF (AGG)</a></li>
+          <li><a class="link" href="https://www.ishares.com/us/products/239466/ishares-tips-bond-etf" target="_blank">iShares TIPS Bond ETF (TIP)</a> (inflation‑protected)</li>
+          <li><a class="link" href="https://www.ishares.com/us/products/239452/ishares-7-10-year-treasury-bond-etf" target="_blank">iShares 7–10 Year Treasury Bond ETF (IEF)</a></li>
+          <li><a class="link" href="https://www.ishares.com/us/products/239466/ishares-tips-bond-etf" target="_blank">iShares TIPS Bond ETF (TIP)</a></li>
+          <li><a class="link" href="https://www.ishares.com/us/products/239450/ishares-1-3-year-treasury-bond-etf" target="_blank">iShares 1–3 Year Treasury Bond ETF (SHY)</a></li>
+          <li><a class="link" href="https://www.ishares.com/us/products/314116/ishares-0-3-month-treasury-bond-etf" target="_blank">iShares 0‑3 Month Treasury Bond ETF (SGOV)</a> (ultra‑short‑term)</li>
+          <li><a class="link" href="https://investor.vanguard.com/investment-products/etfs/profile/vteb" target="_blank">Vanguard Tax‑Exempt Bond ETF (VTEB)</a> (munis; tax‑aware)</li>
+        </ul>
+        <h4>Cash / Money Market</h4>
+        <ul class="list small">
+          <li><a class="link" href="https://investor.vanguard.com/investment-products/money-markets/profile/vmfxx" target="_blank">Vanguard Federal Money Market Fund (VMFXX)</a></li>
+          <li><a class="link" href="https://www.schwabassetmanagement.com/products/snvxx" target="_blank">Schwab U.S. Treasury Money Fund (SNVXX)</a></li>
+        </ul>
+        <div class="hr"></div>
+        <div class="small muted">Always verify expense ratios, minimums, and tax treatment. Consider risk tolerance and time horizon. Make smart financial decisions!</div>
+      </aside>
+    </section>
+
+    <footer class="small muted" style="margin-top:16px">Educational and Project use only. This site does not provide personalized investment advice. Verify product terms with your provider.</footer>
+  </div>
+
+<script>
+// ---------- helpers ----------
+const N = x => Number(String(x).replace(/[,\s]/g, ''));
+const pct = x => N(x) / 100;
+const money = v => Number.isFinite(v) ? v.toLocaleString(undefined,{maximumFractionDigits:2,minimumFractionDigits:2}) : '—';
+
+// TVM
+const fv = (pv, apr, years, m=1) => pv * (1 + apr/m) ** (m*years);
+const pv = (fvAmt, apr, years, m=1) => fvAmt / (1 + apr/m) ** (m*years);
+const effAPY = (apr, m) => (1 + apr/m) ** m - 1;
+const aprFromAPY = (apy, m) => m * ((1 + apy) ** (1/m) - 1);
+
+// Loans
+const loanPayment = (P, apr, years, m=12) => { const r=apr/m, n=Math.round(years*m); if(n<=0) return NaN; if(Math.abs(r)<1e-12) return P/n; return (P*r)/(1-(1+r)**(-n)); };
+const payoffMonths = (balance, apr, payment, m=12) => { const r=apr/m; if(payment <= balance*r) return -1; let b=balance, mo=0; while(b>1e-6 && mo<1200){ const int=b*r; const prin=payment-int; b=Math.max(0,b-prin); mo++; } return mo>=1200?-1:mo; };
+const totalInterest = (balance, apr, payment, m=12) => { const r=apr/m; if(payment <= balance*r) return Infinity; let b=balance, sum=0, g=0; while(b>1e-6 && g<1200){ const int=b*r; b=b+int-payment; sum+=int; g++; } return sum; };
+
+// Inflation
+const infForward = (amt, infl, years) => amt * (1 + infl) ** years;
+const infBackward = (fut, infl, years) => fut / (1 + infl) ** years;
+
+// --- Extra helpers for dynamic suggestions ---
+function monthlyRate(apr){ return apr / 12; }
+function paymentForMonths(balance, apr, months){
+  const r = monthlyRate(apr);
+  if (months <= 0) return NaN;
+  if (Math.abs(r) < 1e-12) return balance / months;
+  return balance * r / (1 - Math.pow(1 + r, -months));
+}
+function monthsForPayment(balance, apr, payment){
+  const r = monthlyRate(apr);
+  if (payment <= balance * r) return -1; // infeasible
+  return Math.ceil(Math.log(payment / (payment - balance*r)) / Math.log(1 + r));
+}
+function money2(x){ return Number.isFinite(x) ? x.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}) : '—'; }
+
+// Suggestions model — richer rules that respond to last computed results
+const S = {
+  last: {},
+  // optional knobs
+  thresholds: {
+    longPayoffMonths: 36,
+    veryLongPayoffMonths: 60,
+    competitiveApy: 3.0,   // %
+    strongApy: 4.5,        // %
+    targetMonths1: 24,
+    targetMonths2: 36,
+  },
+  fmt2(v){ return Number.isFinite(v) ? v.toFixed(2) : '—'; },
+  asPct(x, d=2){ return Number.isFinite(x) ? (x*100).toFixed(d)+'%' : '—'; },
+  money(x){ return Number.isFinite(x) ? x.toLocaleString(undefined,{maximumFractionDigits:2,minimumFractionDigits:2}) : '—'; },
+  make() {
+    const L = this.last;
+    const T = this.thresholds;
+    const tips = [];
+
+    // 1) Loans – payment context and cost awareness
+    if (Number.isFinite(L.loanPay) && L.loanPay > 0) {
+      tips.push(
+        `Your calculated periodic loan payment is $${this.fmt2(L.loanPay)}. ` +
+        `If comparing offers, match term and payment frequency, and compare APRs including fees.`
+      );
+    }
+
+    // 2) Debt payoff – feasibility, duration bands, interest burden
+    if (Number.isFinite(L.payoffMonths)) {
+      if (L.payoffMonths === -1) {
+        tips.push(
+          `Your fixed payment is below monthly interest. Increase payment or reduce APR; otherwise the balance grows.`
+        );
+      } else {
+        const mo = L.payoffMonths;
+        const longBand = mo > T.longPayoffMonths && mo <= T.veryLongPayoffMonths;
+        const veryLongBand = mo > T.veryLongPayoffMonths;
+        const interestNote = Number.isFinite(L.totInt) ? `Estimated total interest over the plan: $${this.money(L.totInt)}.` : '';
+        if (veryLongBand) {
+          tips.push(
+            `Payoff time ≈ ${mo} months. This is very long. Consider increasing payment size, seeking a lower APR (balance transfer or refinance), or targeting windfall payments to principal. ${interestNote}`
+          );
+        } else if (longBand) {
+          tips.push(
+            `Payoff time ≈ ${mo} months. Consider adding ${L.loanPay? 'one extra payment per year or ': ''}10–20% to your monthly payment to cut months and interest. ${interestNote}`
+          );
+        } else {
+          tips.push(
+            `Payoff time ≈ ${mo} months. Staying the course is reasonable; monitor for fees and avoid new charges. ${interestNote}`
+          );
+        }
+      }
+    }
+
+    // 2b) Dynamic debt optimization tips (requires balance/apr/payment)
+    if (Number.isFinite(L.balance) && Number.isFinite(L.apr)) {
+      const r = monthlyRate(L.apr);
+      if (Number.isFinite(L.payment)) {
+        const mo = monthsForPayment(L.balance, L.apr, L.payment);
+        if (mo > 0) {
+          tips.push(`At your current payment of $${money2(L.payment)}, expected payoff is ~${mo} months (no new charges).`);
+        } else if (mo === -1) {
+          const breakeven = L.balance * r;
+          tips.push(`Your payment is below monthly interest ($${money2(breakeven)}). Increase above this to begin reducing principal.`);
+        }
+      }
+      const need1 = paymentForMonths(L.balance, L.apr, T.targetMonths1);
+      const need2 = paymentForMonths(L.balance, L.apr, T.targetMonths2);
+      if (Number.isFinite(need1)) tips.push(`To finish in ≤ ${T.targetMonths1} months, pay about $${money2(need1)} per month.`);
+      if (Number.isFinite(need2)) tips.push(`To finish in ≤ ${T.targetMonths2} months, pay about $${money2(need2)} per month.`);
+    }
+
+    // 3) Savings yield – APY quality and action
+    if (Number.isFinite(L.apy)) {
+      const apyPct = L.apy * 100;
+      if (apyPct < 0.1) {
+        tips.push(`APY is effectively 0%. Move idle cash to a reputable high‑yield savings to protect purchasing power.`);
+      } else if (apyPct < T.competitiveApy) {
+        tips.push(`APY ${apyPct.toFixed(2)}% is low. Shop for accounts ≥ ${T.competitiveApy.toFixed(1)}% with no fees and easy transfers.`);
+      } else if (apyPct < T.strongApy) {
+        tips.push(`APY ${apyPct.toFixed(2)}% is competitive. Ensure there are no maintenance or transfer fees that erase gains.`);
+      } else {
+        tips.push(`APY ${apyPct.toFixed(2)}% is strong. Keep an emergency fund here; excess beyond 3–6 months can be evaluated for longer‑term goals.`);
+      }
+    }
+
+    // 4) Inflation planning – forward/backward conversions
+    if (Number.isFinite(L.infFwd)) {
+      tips.push(
+        `To match today's $${this.money(L.infAmt)} in ${L.infYears} years at ${L.infRate}% inflation, you'll need ≈ $${this.money(L.infFwd)}. ` +
+        `Align savings rate so the future value keeps pace with inflation.`
+      );
+    }
+    if (Number.isFinite(L.infBack)) {
+      tips.push(
+        `The future amount analyzed has today's buying power of about $${this.money(L.infBack)}. ` +
+        `Use this when comparing long‑term goals stated in nominal dollars.`
+      );
+    }
+
+    // 5) General tactics – prioritized actions based on current signals
+    const actions = [];
+    if (L.payoffMonths === -1) actions.push('Raise monthly payment until it exceeds monthly interest.');
+    if (Number.isFinite(L.totInt) && L.totInt > 0) actions.push('Automate payments right after payday to avoid late fees and extra interest.');
+    if (Number.isFinite(L.apy) && L.apy*100 < T.competitiveApy) actions.push('Rate‑shop savings/checking; avoid accounts with monthly fees.');
+    if (actions.length) tips.push('Next steps: ' + actions.map(a => `• ${a}`).join(' '));
+
+    // 6) Guardrails – generic but useful
+    tips.push('Guardrails: avoid new revolving balances while paying down debt; verify APR, fees, and compounding; re‑check calculations after any term change.');
+
+    return tips.join('\n');
+  }
+};
+
+// ---------- wire up UI ----------
+function computeFV(){
+  const pv0=N(pv0El.value), apr=pct(apr1El.value), yrs=N(yrs1El.value), m=N(m1El.value);
+  const out=fv(pv0,apr,yrs,m); fvOut.textContent = money(out); S.last.fv=out; updateSuggestions(); }
+
+function computePV(){
+  const fvT=N(fvTEl.value), apr=pct(apr2El.value), yrs=N(yrs2El.value), m=N(m2El.value);
+  const out=pv(fvT,apr,yrs,m); pvOut.textContent = money(out); S.last.pv=out; updateSuggestions(); }
+
+function computeAPY(){ const apr=pct(aprNEl.value), m=N(mAEl.value); const out=effAPY(apr,m); apyOut.textContent=(out*100).toFixed(4)+'%'; S.last.apy=out; updateSuggestions(); }
+function computeAPR(){ const apy=pct(apyNEl.value), m=N(mBEl.value); const out=aprFromAPY(apy,m); aprOut.textContent=(out*100).toFixed(4)+'%'; S.last.apr=out; updateSuggestions(); }
+
+function computeLoanPayment(){ const P=N(loanPEl.value), r=pct(loanAPREl.value), y=N(loanYEl.value), m=N(loanMEl.value); const out=loanPayment(P,r,y,m); loanPayOut.textContent=money(out); S.last.loanPay=out; updateSuggestions(); }
+function computePayoff(){ const bal=N(debBalEl.value), r=pct(debAPREl.value), pay=N(debPayEl.value); const mo=payoffMonths(bal,r,pay,12); const ti=totalInterest(bal,r,pay,12); monthsOut.textContent= mo===-1? 'payment too small' : mo; totIntOut.textContent = money(ti); S.last.payoffMonths=mo; S.last.totInt=ti; S.last.balance=bal; S.last.apr=r; S.last.payment=pay; updateSuggestions(); }
+
+function computeInflationForward(){ const amt=N(infAmtEl.value), inf=pct(infRateEl.value), yrs=N(infYEl.value); const out=infForward(amt,inf,yrs); infFwdOut.textContent=money(out); S.last.infFwd=out; S.last.infAmt=amt; S.last.infRate=N(infRateEl.value); S.last.infYears=yrs; updateSuggestions(); }
+function computeInflationBackward(){ const fut=N(infFutEl.value), inf=pct(infRate2El.value), yrs=N(infY2El.value); const out=infBackward(fut,inf,yrs); infBackOut.textContent=money(out); S.last.infBack=out; updateSuggestions(); }
+
+function updateSuggestions(){ suggestions.value = S.make(); }
+
+// Planner persistence
+function appendSuggestions(){ planText.value = (planText.value? planText.value + "\n\n" : "") + suggestions.value; }
+function savePlan(){ localStorage.setItem('yf_plan_text', planText.value || ''); alert('Saved locally.'); }
+function loadPlan(){ planText.value = localStorage.getItem('yf_plan_text') || ''; }
+function exportPlan(){ const blob = new Blob([planText.value||''], {type:'text/plain'}); const url = URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='young-finance-plan.txt'; a.click(); URL.revokeObjectURL(url); }
+
+// Quick tests
+function runTests(){
+  const lines=[]; const close=(a,b,eps=1e-6)=>Math.abs(a-b)<=eps;
+  const fvVal=fv(1000,0.06,5,12); const pvVal=pv(fvVal,0.06,5,12); lines.push(`PV(FV(1000,6%,5y,12))≈1000: ${close(pvVal,1000) ? 'PASS' : 'FAIL'} (${pvVal.toFixed(4)})`);
+  const apy=effAPY(0.1999,12); const aprBack=aprFromAPY(apy,12); lines.push(`APR(APY(19.99%))≈19.99%: ${close(aprBack,0.1999,1e-8)?'PASS':'FAIL'} (${(aprBack*100).toFixed(5)}%)`);
+  lines.push(`loanPayment(1200,0,1y,12)=100: ${close(loanPayment(1200,0,1,12),100)?'PASS':'FAIL'}`);
+  const npv0 = [-1,0.5,0.5,0.5].reduce((a,cf,t)=>a+cf/(1+0)**t,0); lines.push(`NPV@0([-1,.5,.5,.5])=0.5: ${close(npv0,0.5)?'PASS':'FAIL'}`);
+  const irrVal = (function irr(cfs,guess=0.1,tol=1e-8,maxIter=200){let r=guess; function dnpv(rr){return cfs.reduce((acc,cf,t)=>acc-(t*cf)/(1+rr)**(t+1),0);} for(let k=0;k<maxIter;k++){const f=cfs.reduce((acc,cf,t)=>acc+cf/(1+r)**t,0); const df=dnpv(r); if(Math.abs(df)<1e-14) return null; const nr=r - f/df; if(Math.abs(nr-r)<tol) return nr; r=nr;} return null;})([-100,110]);
+  lines.push(`IRR([-100,110])≈10%: ${irrVal!=null && close(irrVal,0.10)?'PASS':'FAIL'}`);
+  // round-trip test for dynamic helpers
+  const bal=1000, apr=0.18, target=24; const need=paymentForMonths(bal,apr,target); const mo=monthsForPayment(bal,apr,need);
+  lines.push(`paymentForMonths→monthsForPayment round‑trip (24 mo): ${mo===24?'PASS':'FAIL'} (mo=${mo})`);
+
+  testOut.textContent = lines.join('\n');
+}
+
+// cache elements
+const $=id=>document.getElementById(id);
+const pv0El=$("pv0"), apr1El=$("apr1"), yrs1El=$("yrs1"), m1El=$("m1"), fvOut=$("fvOut");
+const fvTEl=$("fvT"), apr2El=$("apr2"), yrs2El=$("yrs2"), m2El=$("m2"), pvOut=$("pvOut");
+const aprNEl=$("aprN"), mAEl=$("mA"), apyNEl=$("apyN"), mBEl=$("mB"), apyOut=$("apyOut"), aprOut=$("aprOut");
+const loanPEl=$("loanP"), loanAPREl=$("loanAPR"), loanYEl=$("loanY"), loanMEl=$("loanM"), loanPayOut=$("loanPayOut");
+const debBalEl=$("debBal"), debAPREl=$("debAPR"), debPayEl=$("debPay"), monthsOut=$("monthsOut"), totIntOut=$("totIntOut");
+const infAmtEl=$("infAmt"), infRateEl=$("infRate"), infYEl=$("infY"), infFwdOut=$("infFwdOut");
+const infFutEl=$("infFut"), infRate2El=$("infRate2"), infY2El=$("infY2"), infBackOut=$("infBackOut");
+const suggestions=$("suggestions"), planText=$("planText");
+
+// init
+loadPlan();
+</script>
+</body>
+</html>
